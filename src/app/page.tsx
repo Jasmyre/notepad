@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { ModeToggle } from "../components/ui/mode-toggle";
 
 export default function Home() {
 	const onClick = () => {
@@ -9,9 +11,16 @@ export default function Home() {
 
 	return (
 		<main className="flex min-h-screen items-center justify-center">
-			<Button className="cursor-pointer" onClick={onClick} onKeyDown={onClick}>
-				Click Me!
-			</Button>
+			<ButtonGroup>
+				<Button
+					className="cursor-pointer"
+					onClick={onClick}
+					onKeyDown={onClick}
+				>
+					Click Me!
+				</Button>
+				<ModeToggle />
+			</ButtonGroup>
 		</main>
 	);
 }
