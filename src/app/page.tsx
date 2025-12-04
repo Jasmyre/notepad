@@ -8,12 +8,10 @@ export default function Home() {
 	};
 
 	return (
-		<main
-			className="flex min-h-screen items-center justify-center"
-			onClick={onClick}
-			onKeyDown={onClick}
-		>
-			<Button className="cursor-pointer">Click Me!</Button>
+		<main className="flex min-h-screen items-center justify-center">
+			<Button className="cursor-pointer" onClick={onClick} onKeyDown={onClick}>
+				Click Me!
+			</Button>
 		</main>
 	);
 }
