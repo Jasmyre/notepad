@@ -1,9 +1,19 @@
-import { HydrateClient } from "@/trpc/server";
+"use client";
 
-export default async function Home() {
+import { Button } from "@/components/ui/button";
+
+export default function Home() {
+	const onClick = () => {
+		console.log("Hello World!");
+	};
+
 	return (
-		<HydrateClient>
-			<main>Hello World</main>
-		</HydrateClient>
+		<main
+			className="flex min-h-screen items-center justify-center"
+			onClick={onClick}
+			onKeyDown={onClick}
+		>
+			<Button className="cursor-pointer">Click Me!</Button>
+		</main>
 	);
 }
