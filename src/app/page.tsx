@@ -1,11 +1,11 @@
 "use client";
 
+import { ThemeToggle } from "@/components/custom-ui/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Card, CardContent } from "@/components/ui/card";
 import { CreateForm } from "../components/create-form";
 import { NotesSection } from "../components/notes-section";
-import { ModeToggle } from "../components/ui/mode-toggle";
 
 export default function Home() {
 	const onClick = () => {
@@ -13,7 +13,28 @@ export default function Home() {
 	};
 
 	return (
-		<main className="space-y-8 py-32">
+		<main className="space-y-8 px-4 py-10">
+			<section>
+				<div className="mx-auto max-w-3xl">
+					<div className="flex flex-wrap justify-between">
+						<div>
+							<h1 className="font-bold text-2xl">Notepad</h1>
+						</div>
+						<ButtonGroup>
+							<Button
+								className="cursor-pointer hover:bg-destructive hover:dark:bg-destructive"
+								onClick={onClick}
+								onKeyDown={onClick}
+								variant={"outline"}
+							>
+								Clear all
+							</Button>
+							<ThemeToggle />
+						</ButtonGroup>
+					</div>
+				</div>
+			</section>
+
 			<section>
 				<div className="mx-auto max-w-3xl">
 					<Card>
@@ -25,21 +46,6 @@ export default function Home() {
 			</section>
 
 			<NotesSection />
-
-			<section>
-				<div className="mx-auto max-w-3xl">
-					<ButtonGroup>
-						<Button
-							className="cursor-pointer"
-							onClick={onClick}
-							onKeyDown={onClick}
-						>
-							Click Me!
-						</Button>
-						<ModeToggle />
-					</ButtonGroup>
-				</div>
-			</section>
 		</main>
 	);
 }
