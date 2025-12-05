@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { api } from "@/trpc/react";
 import {
 	Field,
 	FieldDescription,
@@ -34,6 +35,9 @@ const formSchema = z.object({
 });
 
 export function CreateForm() {
+	const utils = api.useUtils();
+	const createMutation = api.record.create.useMutation();
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -44,6 +48,12 @@ export function CreateForm() {
 
 	function onSubmit(values: z.infer<typeof formSchema>) {
 		console.log(values);
+		createMutation.mutate(values, {
+			onSuccess: () => {
+				utils.record.invalidate();
+				form.reset();
+			},
+		});
 	}
 
 	return (
