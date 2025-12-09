@@ -1,10 +1,11 @@
 // CRUD helpers for managing an array of `Record` items stored in localStorage using your useLocalStorage hook.
 // Simple, typed, and works well with the hook.
 
+import { v4 as uuidV4 } from "uuid";
 import type { Record } from "@/server/api/routers/record";
 
 // Generates a unique ID (simple and local-safe)
-const uid = () => crypto.randomUUID();
+const uid = () => uuidV4();
 
 export function useRecord(
   data: Record[] | null,
@@ -59,6 +60,7 @@ export function useRecord(
 
 import { useLocalStorage } from "./useLocalStorage";
 import { createRecordHelpers, RecordItem } from "./recordCrudHelpers";
+import { v4 as uuidV4 } from 'uuid';
 
 export function RecordsDemo() {
   const [records, setRecords] = useLocalStorage<RecordItem[] | null>(
