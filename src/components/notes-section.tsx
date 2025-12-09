@@ -1,60 +1,48 @@
 "use client";
 
-import { SquarePen, Trash } from "lucide-react";
-import { api } from "@/trpc/react";
-import { Button } from "./ui/button";
-import {
-	Item,
-	ItemActions,
-	ItemContent,
-	ItemDescription,
-	ItemTitle,
-} from "./ui/item";
+import { useEffect, useState } from "react";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useRecord } from "@/hooks/use-record";
+import type { Record } from "@/server/api/routers/record";
+import { NoteItem } from "./note-item";
 
 export const NotesSection = () => {
-	const records = api.record.getRecords.useQuery().data;
+  // prevent SSR mismatch
+  const [ready, setReady] = useState(false);
 
-	return (
-		<section>
-			<div className="mx-auto max-w-3xl">
-				<div className="flex flex-col gap-4">
-					{records?.map((item) => {
-						return (
-							<Item key={item.id} variant={"muted"}>
-								<ItemContent>
-									<ItemTitle>{item.title}</ItemTitle>
-									<ItemDescription>
-										{item.dateCreated.toLocaleDateString("en-US", {
-											year: "numeric",
-											month: "long",
-											day: "numeric",
-											hour: "2-digit",
-											minute: "2-digit",
-											second: "2-digit",
-										})}
-									</ItemDescription>
-								</ItemContent>
-								<ItemActions>
-									<Button
-										className="cursor-pointer"
-										size={"icon"}
-										variant={"outline"}
-									>
-										<SquarePen />
-									</Button>
-									<Button
-										className="cursor-pointer hover:bg-destructive hover:dark:bg-destructive"
-										size={"icon"}
-										variant={"ghost"}
-									>
-										<Trash />
-									</Button>
-								</ItemActions>
-							</Item>
-						);
-					})}
-				</div>
-			</div>
-		</section>
-	);
+  useEffect(() => setReady(true), []);
+
+  const [records, setRecords] = useLocalStorage<Record[] | null>(
+    "site:records",
+    null,
+    {
+      serializer: (value) => JSON.stringify(value),
+      deserializer: (value) => {
+        const arr = JSON.parse(value) as Record[];
+        return arr.map((item) => ({
+          ...item,
+          dateCreated: new Date(item.dateCreated),
+        }));
+      },
+    }
+  );
+
+  // biome-ignore lint/correctness/noUnusedVariables: explanation
+  const { add, update, remove, get, clear } = useRecord(records, setRecords);
+
+  if (!ready) {
+    return null;
+  }
+
+  return (
+    <section>
+      <div className="mx-auto max-w-3xl">
+        <div className="flex flex-col gap-4">
+          {records?.map((item) => (
+            <NoteItem item={item} key={item.id} remove={remove} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 };

@@ -1,117 +1,129 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
-import { api } from "@/trpc/react";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useRecord } from "@/hooks/use-record";
+import type { Record } from "@/server/api/routers/record";
 import {
-	Field,
-	FieldDescription,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-	FieldLegend,
-	FieldSet,
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
 } from "./ui/field";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 
 const formSchema = z.object({
-	title: z
-		.string()
-		.min(2, {
-			message: "Title must be at least 2 characters.",
-		})
-		.max(64, {
-			message: "Can not exceed max 64 characters.",
-		}),
+  title: z
+    .string()
+    .min(2, {
+      message: "Title must be at least 2 characters.",
+    })
+    .max(64, {
+      message: "Can not exceed max 64 characters.",
+    }),
 
-	description: z
-		.string()
-		.min(2, { message: "Description must be at least 2 characters." })
-		.max(255, { message: "Can not exceed max 255 characters." }),
+  description: z
+    .string()
+    .min(2, { message: "Description must be at least 2 characters." })
+    .max(255, { message: "Can not exceed max 255 characters." }),
 });
 
 export function CreateForm() {
-	const utils = api.useUtils();
-	const createMutation = api.record.create.useMutation();
+  const [isPending, setIsPending] = useTransition();
+  const [records, setRecords] = useLocalStorage<Record[] | null>(
+    "site:records",
+    null,
+    {
+      serializer: (value) => JSON.stringify(value),
+      deserializer: (value) => {
+        const arr = JSON.parse(value) as Record[];
 
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			title: "",
-			description: "",
-		},
-	});
+        return arr.map((item) => ({
+          ...item,
+          dateCreated: new Date(item.dateCreated),
+        }));
+      },
+    }
+  );
+  // biome-ignore lint/correctness/noUnusedVariables: lol
+  const { add, update, remove, get, clear } = useRecord(records, setRecords);
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		console.log(values);
-		createMutation.mutate(values, {
-			onSuccess: () => {
-				utils.record.invalidate();
-				form.reset();
-			},
-		});
-	}
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+    },
+  });
 
-	return (
-		<form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
-			<FieldSet>
-				<FieldLegend>Create Record</FieldLegend>
-				<FieldDescription>What do you have in mind?</FieldDescription>
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsPending(() => {
+      add(values);
+    });
+  }
 
-				<FieldGroup>
-					<Controller
-						control={form.control}
-						name="title"
-						render={({ field, fieldState }) => {
-							return (
-								<Field data-invalid={fieldState.invalid}>
-									<FieldLabel htmlFor="title">Title</FieldLabel>
-									<Input
-										{...field}
-										aria-invalid={fieldState.invalid}
-										id="title"
-										placeholder="Enter record title..."
-									/>
-									{fieldState.invalid && (
-										<FieldError errors={[fieldState.error]} />
-									)}
-								</Field>
-							);
-						}}
-					/>
+  return (
+    <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+      <FieldSet>
+        <FieldLegend>Create Record</FieldLegend>
+        <FieldDescription>What do you have in mind?</FieldDescription>
 
-					<Controller
-						control={form.control}
-						name="description"
-						render={({ field, fieldState }) => {
-							return (
-								<Field data-invalid={fieldState.invalid}>
-									<FieldLabel htmlFor="description">Description</FieldLabel>
-									<Textarea
-										{...field}
-										aria-invalid={fieldState.invalid}
-										id="description"
-										placeholder="Enter record description..."
-									/>
-									{fieldState.invalid && (
-										<FieldError errors={[fieldState.error]} />
-									)}
-								</Field>
-							);
-						}}
-					/>
-				</FieldGroup>
-			</FieldSet>
+        <FieldGroup>
+          <Controller
+            control={form.control}
+            name="title"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="title">Title</FieldLabel>
+                <Input
+                  {...field}
+                  aria-invalid={fieldState.invalid}
+                  disabled={isPending}
+                  id="title"
+                  placeholder="Enter record title..."
+                />
+                {fieldState.invalid ? (
+                  <FieldError errors={[fieldState.error]} />
+                ) : null}
+              </Field>
+            )}
+          />
 
-			<div className="flex justify-end">
-				<Button className="cursor-pointer" type="submit">
-					Submit
-				</Button>
-			</div>
-		</form>
-	);
+          <Controller
+            control={form.control}
+            name="description"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="description">Description</FieldLabel>
+                <Textarea
+                  {...field}
+                  aria-invalid={fieldState.invalid}
+                  disabled={isPending}
+                  id="description"
+                  placeholder="Enter record description..."
+                />
+                {fieldState.invalid ? (
+                  <FieldError errors={[fieldState.error]} />
+                ) : null}
+              </Field>
+            )}
+          />
+        </FieldGroup>
+      </FieldSet>
+
+      <div className="flex justify-end">
+        <Button className="cursor-pointer" disabled={isPending} type="submit">
+          Submit
+        </Button>
+      </div>
+    </form>
+  );
 }
