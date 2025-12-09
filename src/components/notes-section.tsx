@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { useRecord } from "@/hooks/use-record";
 import type { Record } from "@/server/api/routers/record";
 import { NoteItem } from "./note-item";
 
@@ -12,23 +11,16 @@ export const NotesSection = () => {
 
   useEffect(() => setReady(true), []);
 
-  const [records, setRecords] = useLocalStorage<Record[] | null>(
-    "site:records",
-    null,
-    {
-      serializer: (value) => JSON.stringify(value),
-      deserializer: (value) => {
-        const arr = JSON.parse(value) as Record[];
-        return arr.map((item) => ({
-          ...item,
-          dateCreated: new Date(item.dateCreated),
-        }));
-      },
-    }
-  );
-
-  // biome-ignore lint/correctness/noUnusedVariables: explanation
-  const { add, update, remove, get, clear } = useRecord(records, setRecords);
+  const [records] = useLocalStorage<Record[] | null>("site:records", null, {
+    serializer: (value) => JSON.stringify(value),
+    deserializer: (value) => {
+      const arr = JSON.parse(value) as Record[];
+      return arr.map((item) => ({
+        ...item,
+        dateCreated: new Date(item.dateCreated),
+      }));
+    },
+  });
 
   if (!ready) {
     return null;
@@ -39,7 +31,7 @@ export const NotesSection = () => {
       <div className="mx-auto max-w-3xl">
         <div className="flex flex-col gap-4">
           {records?.map((item) => (
-            <NoteItem item={item} key={item.id} remove={remove} />
+            <NoteItem item={item} key={item.id} />
           ))}
         </div>
       </div>

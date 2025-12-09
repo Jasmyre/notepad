@@ -83,7 +83,7 @@ export const EditRecordDialogButton = ({ item }: { item: Record }) => {
       <DialogTrigger asChild>
         <Button
           className="cursor-pointer"
-          title="Create new record"
+          title="Edit record"
           type={"submit"}
           variant={"outline"}
         >

@@ -1,8 +1,7 @@
-import { Trash } from "lucide-react";
 import { useState } from "react";
 import type { Record } from "@/server/api/routers/record";
+import { DeleteRecordAlertDialogButton } from "./delete-record-alert-dialog-button";
 import { EditRecordDialogButton } from "./edit-record-dialog-button";
-import { Button } from "./ui/button";
 import {
   Item,
   ItemActions,
@@ -10,13 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "./ui/item";
-export const NoteItem = ({
-  item,
-  remove,
-}: {
-  item: Record;
-  remove: (item: string) => void;
-}) => {
+export const NoteItem = ({ item }: { item: Record }) => {
   const [isClamped, setIsClamped] = useState(true);
 
   const onSetIsClamped = () => {
@@ -48,14 +41,7 @@ export const NoteItem = ({
       </ItemContent>
       <ItemActions>
         <EditRecordDialogButton item={item} />
-        <Button
-          className="cursor-pointer hover:bg-destructive hover:dark:bg-destructive"
-          onClick={() => remove(item.id)}
-          size="icon"
-          variant="ghost"
-        >
-          <Trash />
-        </Button>
+        <DeleteRecordAlertDialogButton id={item.id} />
       </ItemActions>
     </Item>
   );
