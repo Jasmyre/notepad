@@ -6,10 +6,10 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
-	cacheComponents: true,
-	experimental: {
-		turbopackFileSystemCacheForDev: true,
-	},
+  cacheComponents: true,
+  experimental: {
+    turbopackFileSystemCacheForDev: true,
+  },
 };
 
 export default config;
