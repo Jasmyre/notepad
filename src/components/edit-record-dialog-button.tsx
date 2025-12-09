@@ -92,8 +92,10 @@ export const EditRecordDialogButton = ({ item }: { item: Record }) => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create new Record</DialogTitle>
-          <DialogDescription>What do you have in mind?</DialogDescription>
+          <DialogTitle>Edit Record</DialogTitle>
+          <DialogDescription>
+            Update your note by editing the text and saving your changes.
+          </DialogDescription>
         </DialogHeader>
         <div>
           <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
