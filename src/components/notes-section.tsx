@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import type { Record } from "@/server/api/routers/record";
 import { NoteItem } from "./note-item";
@@ -23,16 +24,26 @@ export const NotesSection = () => {
   });
 
   if (!ready) {
-    return null;
+    return (
+      <section>
+        <div className="mx-auto max-w-3xl">
+          <div className="flex flex-col items-center justify-center gap-4 p-4">
+            <Spinner />
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
     <section>
       <div className="mx-auto max-w-3xl">
-        <div className="flex flex-col gap-4">
-          {records?.map((item) => (
-            <NoteItem item={item} key={item.id} />
-          ))}
+        <div className="flex flex-col gap-4 p-4">
+          {records?.length ? (
+            records.map((item) => <NoteItem item={item} key={item.id} />)
+          ) : (
+            <span className="text-center">You don't have notes yet :(</span>
+          )}
         </div>
       </div>
     </section>

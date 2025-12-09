@@ -1,7 +1,5 @@
-import { Suspense } from "react";
 import { ThemeToggle } from "@/components/custom-ui/theme-toggle";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { Spinner } from "@/components/ui/spinner";
 import { ClearAllAlertDialogButton } from "../components/clear-all-alert-dialog-button";
 import { CreateNewRecordDialogButton } from "../components/create-new-record-dialog-button";
 import { NotesSection } from "../components/notes-section";
@@ -28,9 +26,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Suspense fallback={<Spinner />}>
-        <NotesSection />
-      </Suspense>
+      <NotesSection />
     </main>
   );
 }
